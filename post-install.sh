@@ -108,11 +108,11 @@ EnvironmentFile=-/etc/sysconfig/docker
 EnvironmentFile=-/etc/sysconfig/docker-network
 EnvironmentFile=-/etc/sysconfig/docker-storage
 Type=notify
-ExecStart=/usr/bin/docker daemon -H fd:// $OPTIONS \
-        $DOCKER_STORAGE_OPTIONS \
-        $DOCKER_NETWORK_OPTIONS \
-        $BLOCK_REGISTRY \
-        $INSECURE_REGISTRY
+ExecStart=/usr/bin/docker daemon -H fd:// \$OPTIONS \\
+        \$DOCKER_STORAGE_OPTIONS \\
+        \$DOCKER_NETWORK_OPTIONS \\
+        \$BLOCK_REGISTRY \\
+        \$INSECURE_REGISTRY
 MountFlags=slave
 LimitNOFILE=1048576
 LimitNPROC=1048576
