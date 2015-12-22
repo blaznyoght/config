@@ -88,15 +88,40 @@ EOF
 
 yum install -y docker-engine
 
-sed -i '/\[Service\]/ a EnvironmentFile=-/etc/sysconfig/docker-storage' /usr/lib/systemd/system/docker.service
-sed -i '/\[Service\]/ a EnvironmentFile=-/etc/sysconfig/docker-network' /usr/lib/systemd/system/docker.service
-sed -i '/\[Service\]/ a EnvironmentFile=-/etc/sysconfig/docker' /usr/lib/systemd/system/docker.service
-sed -i 's/fd:\/\//fd:\/\/ \$OPTIONS \\/' /usr/lib/systemd/system/docker.service
-sed -i '/\$OPTIONS \\/ a \\t$DOCKER_STORAGE_OPTIONS \\\n\t$DOCKER_NETWORK_OPTIONS \\\n\t$BLOCK_REGISTRY \\\n\t$INSECURE_REGISTRY' /usr/lib/systemd/system/docker.service
+#sed -i '/\[Service\]/ a EnvironmentFile=-/etc/sysconfig/docker-storage' /usr/lib/systemd/system/docker.service
+#sed -i '/\[Service\]/ a EnvironmentFile=-/etc/sysconfig/docker-network' /usr/lib/systemd/system/docker.service
+#sed -i '/\[Service\]/ a EnvironmentFile=-/etc/sysconfig/docker' /usr/lib/systemd/system/docker.service
+#sed -i 's/fd:\/\//fd:\/\/ \$OPTIONS \\/' /usr/lib/systemd/system/docker.service
+#sed -i '/\$OPTIONS \\/ a \\t$DOCKER_STORAGE_OPTIONS \\\n\t$DOCKER_NETWORK_OPTIONS \\\n\t$BLOCK_REGISTRY \\\n\t$INSECURE_REGISTRY' /usr/lib/systemd/system/docker.service
+#
+mkdir /etc/systemd/system/docker.service.d
+
+cat << EOF > /etc/systemd/system/docker.service.d
+[Unit]
+Description=Docker Application Container Engine
+Documentation=https://docs.docker.com
+After=network.target docker.socket
+Requires=docker.socket
+[Service]
+EnvironmentFile=-/etc/sysconfig/docker
+EnvironmentFile=-/etc/sysconfig/docker-network
+EnvironmentFile=-/etc/sysconfig/docker-storage
+Type=notify
+ExecStart=/usr/bin/docker daemon -H fd:// $OPTIONS \
+        $DOCKER_STORAGE_OPTIONS \
+        $DOCKER_NETWORK_OPTIONS \
+        $BLOCK_REGISTRY \
+        $INSECURE_REGISTRY
+MountFlags=slave
+LimitNOFILE=1048576
+LimitNPROC=1048576
+LimitCORE=infinity
+[Install]
+WantedBy=multi-user.target
+EOF
 
 cat << EOF > /etc/sysconfig/docker-storage
-DOCKER_STORAGE_OPTIONS="--storage-driver=devicemapper --storage-opt dm.datadev=/dev/vg-docker/data --storage-opt
- dm.metadatadev=/dev/vg-docker/metadata"
+DOCKER_STORAGE_OPTIONS="--storage-driver=devicemapper --storage-opt dm.datadev=/dev/vg-docker/data --storage-opt dm.metadatadev=/dev/vg-docker/metadata"
 EOF
 
 systemctl daemon-reload
