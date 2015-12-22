@@ -1,6 +1,8 @@
 #!/bin/sh
 
 # Partition disks
+#################
+
 cat << EOF | sfdisk --force /dev/sda
 # partition table of /dev/sda
 unit: sectors
@@ -14,6 +16,8 @@ EOF
 partprobe
 
 # Setup main volumes
+####################
+
 pvcreate -f /dev/sda3
 vgcreate vg-main /dev/sda3
 lvcreate -L 150G -n home vg-main
@@ -39,13 +43,16 @@ mount /dev/vg-main/home /tmp/tmpmnt
 rsync -av /home/ /tmp/tmpmnt
 umount /tmp/tmpmnt
 
+
 # Setup docker volumes
+######################
 pvcreate /dev/sda4
 vgcreate vg-docker /dev/sda4
 lvcreate -L 4G -n metadata vg-docker
 lvcreate -L 67G -n data vg-docker
 
 # Setup fstab
+#############
 mv /etc/fstab /etc/fstab.bak
 cat << EOF > /etc/fstab
 #  <file system>	<mount point>	<type>	<options>	<dump>	<pass>
@@ -64,8 +71,38 @@ EOF
 mount /var
 mount /home
 
+yum update
+
 yum install -y zsh
 
+# Docker Setup
+##############
+tee /etc/yum.repos.d/docker.repo <<-'EOF'
+[dockerrepo]
+name=Docker Repository
+baseurl=https://yum.dockerproject.org/repo/main/centos/$releasever/
+enabled=1
+gpgcheck=1
+gpgkey=https://yum.dockerproject.org/gpg
+EOF
+
+yum install -y docker-engine
+
+sed -i '/\[Service\]/ a EnvironmentFile=-/etc/sysconfig/docker-storage' /usr/lib/systemd/system/docker.service
+sed -i '/\[Service\]/ a EnvironmentFile=-/etc/sysconfig/docker-network' /usr/lib/systemd/system/docker.service
+sed -i '/\[Service\]/ a EnvironmentFile=-/etc/sysconfig/docker' /usr/lib/systemd/system/docker.service
+sed -i 's/fd:\/\//fd:\/\/ \$OPTIONS \\/' /usr/lib/systemd/system/docker.service
+sed -i '/\$OPTION/ a \n\t$DOCKER_STORAGE_OPTIONS \\\n\t$DOCKER_NETWORK_OPTIONS \\\n\t$BLOCK_REGISTRY \\\n\t$INSECURE_REGISTRY' /usr/lib/systemd/system/docker.service
+
+cat << EOF > /etc/sysconfig/docker-storage
+DOCKER_STORAGE_OPTIONS="--storage-driver=devicemapper --storage-opt dm.datadev=/dev/vg-docker/data --storage-opt
+ dm.metadatadev=/dev/vg-docker/metadata"
+EOF
+
+systemctl daemon-reload
+
+# Setup User
+############
 useradd -m -G wheel -s /usr/bin/zsh blaz
 
 mkdir /home/blaz/.ssh
@@ -76,3 +113,5 @@ EOF
 cat << EOF > /home/blaz/.ssh/authorized_keys2
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCo7wH+kaPtgPSvWsUqat9OzYxteG8FoyZR8lxWiW+LrJ9vpweVmGndyiztweJBk75Iqj3rHeuB1kSsP3f6rNn8+veyp7QX/ExxraOf3fAlw17x3vXSvvDrB12cdbmN7j3V6R0DfwUshsSWd+Nid5T2gtXr3UR8CfZ2PANq4Sf82F9DMX9iW1Cg4XBsn6cFxeL4blJDL5IQ9D4kJhAlqDRefe2Edl+tjtsukd1Z6M28KOWPDdFuO1aqx6qlWa6TuM38PV4soiDTr7h61DhHjQgEMnV98xHYAn4KRAgfhGY3EN9t25LIHUJ4hH6Hmba8RYQUJK4YgHzsdhInwoSLJ pyaillet@ITEM-87245
 EOF
+
+reboot
