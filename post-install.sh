@@ -1,5 +1,7 @@
 #!/bin/sh
 
+USERNAME="blaz"
+
 # Partition disks
 #################
 
@@ -130,14 +132,15 @@ systemctl enable docker
 
 # Setup User
 ############
-useradd -m -G wheel -s /usr/bin/zsh blaz
+useradd -m -G wheel -s /usr/bin/zsh $USERNAME
 
-mkdir /home/blaz/.ssh
-cat << EOF > /home/blaz/.ssh/authorized_keys2
+
+mkdir /home/$USERNAME/.ssh
+cat << EOF > /home/$USERNAME/.ssh/authorized_keys2
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDDsf9AJoKMwASt2ekFiwysP9mVSpODPzFLJ298U9RAFFI902Mt4mpQuFVB7w0M74HjneTIDIOjstNlYnCeS2aMOtKcjnmLciqd4wtEAoh26C2S9JUzdqm6oQZYb1C21JirNqBtIZ6gGUlE8NmkcVa9ODD1wHDp608lidLoFPDSEePM29c4SSMvoXR3TCqRwFeX+WhfzmdQZh5bASfwQpLm4Qn2e12h93TjQm0Q/AdxEHagnhyWR9jTOtnf5Mo/X5pLJc2dh859Vh/1xTZudgrCHF5n4rMzrG7zC7AlkL6l+NR41wfksUhT7tNuhcpVTHGDbyCmZsQrZClmhECkq5T blaznyoght@MacBook-Pro-de-Pierre-Yves.local
 EOF
 
-cat << EOF > /home/blaz/.ssh/authorized_keys2
+cat << EOF > /home/$USERNAME/.ssh/authorized_keys2
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCo7wH+kaPtgPSvWsUqat9OzYxteG8FoyZR8lxWiW+LrJ9vpweVmGndyiztweJBk75Iqj3rHeuB1kSsP3f6rNn8+veyp7QX/ExxraOf3fAlw17x3vXSvvDrB12cdbmN7j3V6R0DfwUshsSWd+Nid5T2gtXr3UR8CfZ2PANq4Sf82F9DMX9iW1Cg4XBsn6cFxeL4blJDL5IQ9D4kJhAlqDRefe2Edl+tjtsukd1Z6M28KOWPDdFuO1aqx6qlWa6TuM38PV4soiDTr7h61DhHjQgEMnV98xHYAn4KRAgfhGY3EN9t25LIHUJ4hH6Hmba8RYQUJK4YgHzsdhInwoSLJ pyaillet@ITEM-87245
 EOF
 
