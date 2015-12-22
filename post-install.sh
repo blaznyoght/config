@@ -131,7 +131,7 @@ systemctl enable docker
 
 # Setup User
 ############
-useradd -m -G wheel -s /usr/bin/zsh $USERNAME
+useradd -m -G wheel,docker -s /usr/bin/zsh $USERNAME
 
 
 mkdir /home/$USERNAME/.ssh
@@ -142,5 +142,7 @@ EOF
 cat << EOF > /home/$USERNAME/.ssh/authorized_keys2
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCo7wH+kaPtgPSvWsUqat9OzYxteG8FoyZR8lxWiW+LrJ9vpweVmGndyiztweJBk75Iqj3rHeuB1kSsP3f6rNn8+veyp7QX/ExxraOf3fAlw17x3vXSvvDrB12cdbmN7j3V6R0DfwUshsSWd+Nid5T2gtXr3UR8CfZ2PANq4Sf82F9DMX9iW1Cg4XBsn6cFxeL4blJDL5IQ9D4kJhAlqDRefe2Edl+tjtsukd1Z6M28KOWPDdFuO1aqx6qlWa6TuM38PV4soiDTr7h61DhHjQgEMnV98xHYAn4KRAgfhGY3EN9t25LIHUJ4hH6Hmba8RYQUJK4YgHzsdhInwoSLJ pyaillet@ITEM-87245
 EOF
+
+chown -R blaz:blaz /home/$USERNAME/.ssh
 
 reboot
