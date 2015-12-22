@@ -96,9 +96,8 @@ yum install -y docker-engine
 #sed -i 's/fd:\/\//fd:\/\/ \$OPTIONS \\/' /usr/lib/systemd/system/docker.service
 #sed -i '/\$OPTIONS \\/ a \\t$DOCKER_STORAGE_OPTIONS \\\n\t$DOCKER_NETWORK_OPTIONS \\\n\t$BLOCK_REGISTRY \\\n\t$INSECURE_REGISTRY' /usr/lib/systemd/system/docker.service
 #
-mkdir /etc/systemd/system/docker.service.d
 
-cat << EOF > /etc/systemd/system/docker.service.d
+cat << EOF > /etc/systemd/system/docker.service
 [Unit]
 Description=Docker Application Container Engine
 Documentation=https://docs.docker.com
