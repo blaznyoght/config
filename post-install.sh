@@ -92,7 +92,7 @@ sed -i '/\[Service\]/ a EnvironmentFile=-/etc/sysconfig/docker-storage' /usr/lib
 sed -i '/\[Service\]/ a EnvironmentFile=-/etc/sysconfig/docker-network' /usr/lib/systemd/system/docker.service
 sed -i '/\[Service\]/ a EnvironmentFile=-/etc/sysconfig/docker' /usr/lib/systemd/system/docker.service
 sed -i 's/fd:\/\//fd:\/\/ \$OPTIONS \\/' /usr/lib/systemd/system/docker.service
-sed -i '/\$OPTION/ a \n\t$DOCKER_STORAGE_OPTIONS \\\n\t$DOCKER_NETWORK_OPTIONS \\\n\t$BLOCK_REGISTRY \\\n\t$INSECURE_REGISTRY' /usr/lib/systemd/system/docker.service
+sed -i '/\$OPTIONS \\/ a \\t$DOCKER_STORAGE_OPTIONS \\\n\t$DOCKER_NETWORK_OPTIONS \\\n\t$BLOCK_REGISTRY \\\n\t$INSECURE_REGISTRY' /usr/lib/systemd/system/docker.service
 
 cat << EOF > /etc/sysconfig/docker-storage
 DOCKER_STORAGE_OPTIONS="--storage-driver=devicemapper --storage-opt dm.datadev=/dev/vg-docker/data --storage-opt
@@ -100,6 +100,8 @@ DOCKER_STORAGE_OPTIONS="--storage-driver=devicemapper --storage-opt dm.datadev=/
 EOF
 
 systemctl daemon-reload
+
+systemctl enable docker
 
 # Setup User
 ############
