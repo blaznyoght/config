@@ -18,18 +18,18 @@ pvcreate -f /dev/sda3
 vgcreate vg-main /dev/sda3
 lvcreate -L 150G -n home vg-main
 lvcreate -L 50G -n var vg-main
-lvcreate -L 50G -n usr vg-main
+#lvcreate -L 50G -n usr vg-main
 
 mkswap /dev/sda2
 mkfs.ext4 /dev/vg-main/home
 mkfs.ext4 /dev/vg-main/var
-mkfs.ext4 /dev/vg-main/usr
+#mkfs.ext4 /dev/vg-main/usr
 
-# Transfer files: usr
 mkdir /tmp/tmpmnt
-mount /dev/vg-main/usr /tmp/tmpmnt
-rsync -av /usr/ /tmp/tmpmnt
-umount /tmp/tmpmnt
+# Transfer files: usr
+#mount /dev/vg-main/usr /tmp/tmpmnt
+#rsync -av /usr/ /tmp/tmpmnt
+#umount /tmp/tmpmnt
 # Transfer files: var
 mount /dev/vg-main/var /tmp/tmpmnt
 rsync -av /var/ /tmp/tmpmnt
@@ -53,14 +53,14 @@ cat << EOF > /etc/fstab
 /dev/sda2 swap swap	defaults 0 0
 /dev/vg-main/home /home ext4 defaults 1 2
 /dev/vg-main/var /var ext4 defaults 1 2
-/dev/vg-main/usr /usr ext4 defaults 1 2
+#/dev/vg-main/usr /usr ext4 defaults 1 2
 proc /proc proc defaults 0	0
 sysfs /sys sysfs defaults 0 0
 tmpfs /dev/shm tmpfs defaults 0 0
 devpts /dev/pts devpts defaults 0 0
 EOF
 
-mount /usr
+#mount /usr
 mount /var
 mount /home
 
